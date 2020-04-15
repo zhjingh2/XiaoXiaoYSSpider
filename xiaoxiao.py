@@ -38,12 +38,12 @@ def requestXiaoXiaoSearchWithWd(wd):
 
     response = requests.get(XIAOXIAO_SEARCH_URL, headers=headers, params=params, verify=False)
     jsonDic = json.loads(response.text)
-    print(jsonDic)
+    # print(jsonDic)
     result = []
     for info in parseXiaoXiaoSearchWithResponse(jsonDic):
         m3u8url = requestM3U8WithInfo(info)
         result.append({'名称' : info[1], '集数' : info[3], '播放地址' : m3u8url})
-    print(result)
+    print(str(result))
     if len(result) > 0:
         return str(result)
     else:
