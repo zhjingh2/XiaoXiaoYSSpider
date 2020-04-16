@@ -7,12 +7,17 @@ import json
 XIAOXIAO_SEARCH_URL = 'http://fe2wzffedps4ejknbnnv.xiaoxiaoapps.com/search'
 XIAOXIAO_M3U8_QUERY = 'https://fe2wzffedps4ejknbnnv.xiaoxiaoapps.com/vod/reqplay/'
 
+xxx_api_auth = '3037396564323935303466623161613564303436393964623735663338616163'
+
 headers = {
         "Accept" : 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         "Upgrade-Insecure-Requests" : "1",
         "Accept-Language" : 'zh-cn',
-        "User-Agent" : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15',
-    }
+        "Cookie" : ('xxx_api_auth=' + xxx_api_auth),
+        "Host" : 'fe2wzffedps4ejknbnnv.xiaoxiaoapps.com',
+        "User-Agent" : 'watemmeloncircle/2.1.5 (iPhone; iOS 13.3.1; Scale/2.00)',
+}
+
 
 __all__ = ['app']
 app = Flask(__name__)
@@ -35,17 +40,17 @@ def requestXiaoXiaoSearchWithWd(wd):
         's_platform' : 'ios',
         'wd' : wd,
     }
-
     response = requests.get(XIAOXIAO_SEARCH_URL, headers=headers, params=params, verify=False)
     jsonDic = json.loads(response.text)
     # print(jsonDic)
-    result = []
+    data = jsonDic['data']
+    resultArr = []
     for info in parseXiaoXiaoSearchWithResponse(jsonDic):
         m3u8url = requestM3U8WithInfo(info)
-        result.append({'名称' : info[1], '集数' : info[3], '播放地址' : m3u8url})
-    print(str(result))
-    if len(result) > 0:
-        return str(result)
+        resultArr.append({'名称' : info[1], '集数' : info[3], '播放地址' : m3u8url})
+        app.logger.warning('名称: ' + info[1] + ' 集数: ' + info[3] + ' 播放地址: ' + m3u8url)
+    if len(resultArr) > 0:
+        return str(resultArr)
     else:
         return "无搜索结果"
 
@@ -71,7 +76,7 @@ def requestM3U8WithInfo(info):
         '_t': (int(time.time()) * 1000),
         'pid': '',
         'playindex' : info[2],
-        's_device_id': '5C5E1143-A51A-4D9D-935A-00B663A01142',
+        's_device_id': '5C5E1143-A51A-4D9D-935A-00B663A01141',
         's_os_version': '13.3.1',
         's_platform': 'ios',
     }
@@ -82,11 +87,12 @@ def requestM3U8WithInfo(info):
 def parseXiaoXiaoM3U8WithResponse(jsonDic):
     try:
         data = jsonDic['data']
+        retcode = jsonDic['retcode']
         httpurl = data['httpurl']
         return httpurl
     except:
-        return None
-    return None
+        return str(retcode)
+    return ''
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
