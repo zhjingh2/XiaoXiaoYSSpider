@@ -34,7 +34,7 @@ def search():
         return requestXiaoXiaoSearchWithWd(searchword)
     else:
         data = request.form["json"]
-        searchword = re.search(r'[".*?"]', data).group()
+        searchword = re.search(r'\["(.*?)"\]', data).group(1)
 
         app.logger.warning(type(searchword))
         return searchword
