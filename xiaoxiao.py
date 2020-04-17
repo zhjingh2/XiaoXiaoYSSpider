@@ -33,7 +33,7 @@ def search():
         searchword = request.args.get('wd', '')
         return requestXiaoXiaoSearchWithWd(searchword)
     else:
-        data = dict(request.form)
+        data = request.form.to_dict()
 
         app.logger.warning(type(data))
         return data
