@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import request
+from threading import Thread
 import requests
 import time
 import json
@@ -20,6 +21,13 @@ headers = {
 }
 
 
+def async(f):
+    def wrapper(*args, **kwargs):
+        thr = Thread(target=f, args=args, kwargs=kwargs)
+        thr.start()
+
+    return wrapper
+
 __all__ = ['app']
 app = Flask(__name__)
 
@@ -36,8 +44,33 @@ def search():
         data = request.form["json"]
         reSearch = re.search(r'\["(.*?)"\]', data).group(1)
         searchword = reSearch.encode('utf-8').decode('unicode_escape')
-        app.logger.warning(searchword)
-        return requestXiaoXiaoSearchWithWd(searchword)
+        app.logger.warning("POST" + searchword)
+        asyncRequestXiaoXiaoSearchWithWd(searchword)
+        return "searching.."
+
+@async
+def asyncRequestXiaoXiaoSearchWithWd(wd):
+    params = {
+        '_t' : (int(time.time()) * 1000),
+        'pid' : '',
+        's_device_id' : '5C5E1143-A51A-4D9D-935A-00B663A01142',
+        's_os_version' : '13.3.1',
+        's_platform' : 'ios',
+        'wd' : wd,
+    }
+    response = requests.get(XIAOXIAO_SEARCH_URL, headers=headers, params=params, verify=False)
+    jsonDic = json.loads(response.text)
+    # print(jsonDic)
+    data = jsonDic['data']
+    resultArr = []
+    for info in parseXiaoXiaoSearchWithResponse(jsonDic):
+        m3u8url = requestM3U8WithInfo(info)
+        resultArr.append({'名称' : info[1], '集数' : info[3], '播放地址' : m3u8url})
+        app.logger.warning('名称: ' + info[1] + ' 集数: ' + info[3] + ' 播放地址: ' + m3u8url)
+    if len(resultArr) > 0:
+        return str(resultArr)
+    else:
+        return "无搜索结果"
 
 def requestXiaoXiaoSearchWithWd(wd):
     params = {
