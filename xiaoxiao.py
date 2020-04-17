@@ -34,6 +34,7 @@ def search():
         return requestXiaoXiaoSearchWithWd(searchword)
     else:
         data = request.get_data()
+        return data
         searchword = re.search(r'\[.+?\]')
         return searchword
         jsondata = json.loads(data)
