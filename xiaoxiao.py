@@ -33,7 +33,7 @@ def search():
         return requestXiaoXiaoSearchWithWd(searchword)
     else:
         data = request.get_data()
-        jsondata = json.loads(data.decode("utf-8"))
+        jsondata = json.loads(data)
         app.logger.warning(str(jsondata))
         return jsondata
 
