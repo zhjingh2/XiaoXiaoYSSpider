@@ -38,8 +38,8 @@ def search():
         reSearch = re.search(r'\["(.*?)"\]', data).group(1)
         searchword = reSearch.encode('utf-8').decode('unicode_escape')
         app.logger.warning("POST" + searchword)
-        asyRequestXiaoXiaoSearchWithWd(searchword)
-        return "searching.."
+        yield "searching.."
+        requestXiaoXiaoSearchWithWd(searchword)
 
 async def asyRequestXiaoXiaoSearchWithWd(wd):
     params = {
