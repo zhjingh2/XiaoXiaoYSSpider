@@ -6,7 +6,9 @@ import time
 import json
 import re
 
+# 搜索资源信息URL
 XIAOXIAO_SEARCH_URL = 'http://fe2wzffedps4ejknbnnv.xiaoxiaoapps.com/search'
+# 视频资源地址查询URL
 XIAOXIAO_M3U8_QUERY = 'https://fe2wzffedps4ejknbnnv.xiaoxiaoapps.com/vod/reqplay/'
 
 xxx_api_auth = '3037396564323935303466623161613564303436393964623735663338616163'
@@ -20,7 +22,6 @@ headers = {
         "User-Agent" : 'watemmeloncircle/2.1.5 (iPhone; iOS 13.3.1; Scale/2.00)',
 }
 
-
 # 创建线程池执行器
 executor = ThreadPoolExecutor(2)
 
@@ -29,13 +30,15 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return 'XiaoXiao m3u8 Finder. Please use /search?wd=名称'
+    return 'XiaoXiao m3u8 Searcher. Please use /search?wd=名称'
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
+    # 同步查询使用 GET
     if request.method == 'GET':
         searchword = request.args.get('wd', '')
         return requestXiaoXiaoSearchWithWd(searchword)
+    # 异步查询使用 POST（接入微信个人号推送）
     else:
         data = request.form["json"]
         reSearch = re.search(r'\["(.*?)"\]', data).group(1)
@@ -45,6 +48,7 @@ def search():
         executor.submit(asyRequestXiaoXiaoSearchWithWd, searchword)
         return "searching.."
 
+# 异步查询视频资源信息
 def asyRequestXiaoXiaoSearchWithWd(wd):
     params = {
         '_t' : (int(time.time()) * 1000),
@@ -56,8 +60,6 @@ def asyRequestXiaoXiaoSearchWithWd(wd):
     }
     response = requests.get(XIAOXIAO_SEARCH_URL, headers=headers, params=params, verify=False)
     jsonDic = json.loads(response.text)
-    # print(jsonDic)
-    data = jsonDic['data']
     resultArr = []
     for info in parseXiaoXiaoSearchWithResponse(jsonDic):
         m3u8url = requestM3U8WithInfo(info)
@@ -76,6 +78,7 @@ def asyRequestXiaoXiaoSearchWithWd(wd):
         }
         requests.post('https://sc.ftqq.com/SCU92977Ta943f796c0248f26c595e01585c6b30e5e8d16eeda6e0.send', data=data)
 
+# 同步查询视频资源信息
 def requestXiaoXiaoSearchWithWd(wd):
     params = {
         '_t' : (int(time.time()) * 1000),
@@ -87,8 +90,6 @@ def requestXiaoXiaoSearchWithWd(wd):
     }
     response = requests.get(XIAOXIAO_SEARCH_URL, headers=headers, params=params, verify=False)
     jsonDic = json.loads(response.text)
-    # print(jsonDic)
-    data = jsonDic['data']
     resultArr = []
     for info in parseXiaoXiaoSearchWithResponse(jsonDic):
         m3u8url = requestM3U8WithInfo(info)
@@ -99,6 +100,7 @@ def requestXiaoXiaoSearchWithWd(wd):
     else:
         return "无搜索结果"
 
+# 解析视频资源信息
 def parseXiaoXiaoSearchWithResponse(jsonDic):
     try:
         data = jsonDic['data']
@@ -115,6 +117,7 @@ def parseXiaoXiaoSearchWithResponse(jsonDic):
         return None
     return None
 
+# 查询视频m3u8地址
 def requestM3U8WithInfo(info):
     url = XIAOXIAO_M3U8_QUERY + info[0]
     params = {
@@ -129,6 +132,7 @@ def requestM3U8WithInfo(info):
     jsonDic = json.loads(response.text)
     return parseXiaoXiaoM3U8WithResponse(jsonDic)
 
+# 解析获取视频m3u8地址
 def parseXiaoXiaoM3U8WithResponse(jsonDic):
     try:
         data = jsonDic['data']
