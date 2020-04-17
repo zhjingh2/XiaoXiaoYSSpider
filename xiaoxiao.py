@@ -26,10 +26,13 @@ app = Flask(__name__)
 def index():
     return 'XiaoXiao m3u8 Finder. Please use /search?wd=名称'
 
-@app.route('/search', methods=['GET'])
+@app.route('/search', methods=['GET', 'POST'])
 def search():
-    searchword = request.args.get('wd', '')
-    return requestXiaoXiaoSearchWithWd(searchword)
+    if request.method == 'GET':
+        searchword = request.args.get('wd', '')
+        return requestXiaoXiaoSearchWithWd(searchword)
+    else:
+        app.logger.warning(str(request.form))
 
 def requestXiaoXiaoSearchWithWd(wd):
     params = {
