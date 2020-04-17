@@ -1,10 +1,9 @@
 from flask import Flask
 from flask import request
-from threading import Thread
+from concurrent.futures import ThreadPoolExecutor
 import requests
 import time
 import json
-import asyncio
 import re
 
 XIAOXIAO_SEARCH_URL = 'http://fe2wzffedps4ejknbnnv.xiaoxiaoapps.com/search'
@@ -20,6 +19,10 @@ headers = {
         "Host" : 'fe2wzffedps4ejknbnnv.xiaoxiaoapps.com',
         "User-Agent" : 'watemmeloncircle/2.1.5 (iPhone; iOS 13.3.1; Scale/2.00)',
 }
+
+
+# 创建线程池执行器
+executor = ThreadPoolExecutor(2)
 
 __all__ = ['app']
 app = Flask(__name__)
@@ -38,8 +41,8 @@ def search():
         reSearch = re.search(r'\["(.*?)"\]', data).group(1)
         searchword = reSearch.encode('utf-8').decode('unicode_escape')
         app.logger.warning("POST" + searchword)
-        yield "searching.."
-        requestXiaoXiaoSearchWithWd(searchword)
+        executor.submit(requestXiaoXiaoSearchWithWd, searchword)
+        return "searching.."
 
 async def asyRequestXiaoXiaoSearchWithWd(wd):
     params = {
