@@ -3,6 +3,7 @@ from flask import request
 import requests
 import time
 import json
+import re
 
 XIAOXIAO_SEARCH_URL = 'http://fe2wzffedps4ejknbnnv.xiaoxiaoapps.com/search'
 XIAOXIAO_M3U8_QUERY = 'https://fe2wzffedps4ejknbnnv.xiaoxiaoapps.com/vod/reqplay/'
@@ -33,7 +34,8 @@ def search():
         return requestXiaoXiaoSearchWithWd(searchword)
     else:
         data = request.get_data()
-        return data
+        searchword = re.search(r'[.+?]')
+        return searchword
         jsondata = json.loads(data)
         app.logger.warning(str(jsondata))
         return jsondata
