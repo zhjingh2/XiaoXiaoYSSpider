@@ -4,6 +4,7 @@ from threading import Thread
 import requests
 import time
 import json
+import asyncio
 import re
 
 XIAOXIAO_SEARCH_URL = 'http://fe2wzffedps4ejknbnnv.xiaoxiaoapps.com/search'
@@ -19,14 +20,6 @@ headers = {
         "Host" : 'fe2wzffedps4ejknbnnv.xiaoxiaoapps.com',
         "User-Agent" : 'watemmeloncircle/2.1.5 (iPhone; iOS 13.3.1; Scale/2.00)',
 }
-
-
-def async(f):
-    def wrapper(*args, **kwargs):
-        thr = Thread(target=f, args=args, kwargs=kwargs)
-        thr.start()
-
-    return wrapper
 
 __all__ = ['app']
 app = Flask(__name__)
@@ -45,11 +38,10 @@ def search():
         reSearch = re.search(r'\["(.*?)"\]', data).group(1)
         searchword = reSearch.encode('utf-8').decode('unicode_escape')
         app.logger.warning("POST" + searchword)
-        asyncRequestXiaoXiaoSearchWithWd(searchword)
+        asyRequestXiaoXiaoSearchWithWd(searchword)
         return "searching.."
 
-@async
-def asyncRequestXiaoXiaoSearchWithWd(wd):
+async def asyRequestXiaoXiaoSearchWithWd(wd):
     params = {
         '_t' : (int(time.time()) * 1000),
         'pid' : '',
@@ -68,9 +60,10 @@ def asyncRequestXiaoXiaoSearchWithWd(wd):
         resultArr.append({'名称' : info[1], '集数' : info[3], '播放地址' : m3u8url})
         app.logger.warning('名称: ' + info[1] + ' 集数: ' + info[3] + ' 播放地址: ' + m3u8url)
     if len(resultArr) > 0:
-        return str(resultArr)
+        data = resultArr
+        requests.post('https://sc.ftqq.com/SCU92977Ta943f796c0248f26c595e01585c6b30e5e8d16eeda6e0.send', data=data)
     else:
-        return "无搜索结果"
+        requests.post('https://sc.ftqq.com/SCU92977Ta943f796c0248f26c595e01585c6b30e5e8d16eeda6e0.send', params={'text':'无'})
 
 def requestXiaoXiaoSearchWithWd(wd):
     params = {
