@@ -34,11 +34,12 @@ def search():
         return requestXiaoXiaoSearchWithWd(searchword)
     else:
         data = request.get_data().decode('utf8')
+        app.logger.warning(type(request.values))
         return data
         searchword = re.search(r'\[.+?\]')
         return searchword
         jsondata = json.loads(data)
-        app.logger.warning(str(jsondata))
+
         return jsondata
 
 def requestXiaoXiaoSearchWithWd(wd):
