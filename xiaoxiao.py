@@ -41,10 +41,10 @@ def search():
         reSearch = re.search(r'\["(.*?)"\]', data).group(1)
         searchword = reSearch.encode('utf-8').decode('unicode_escape')
         app.logger.warning("POST" + searchword)
-        executor.submit(requestXiaoXiaoSearchWithWd, searchword)
+        executor.submit(asyRequestXiaoXiaoSearchWithWd, searchword)
         return "searching.."
 
-async def asyRequestXiaoXiaoSearchWithWd(wd):
+def asyRequestXiaoXiaoSearchWithWd(wd):
     params = {
         '_t' : (int(time.time()) * 1000),
         'pid' : '',
@@ -63,10 +63,13 @@ async def asyRequestXiaoXiaoSearchWithWd(wd):
         resultArr.append({'名称' : info[1], '集数' : info[3], '播放地址' : m3u8url})
         app.logger.warning('名称: ' + info[1] + ' 集数: ' + info[3] + ' 播放地址: ' + m3u8url)
     if len(resultArr) > 0:
-        data = resultArr
+        data = {
+            "text" : '结果',
+            'desp' : str(resultArr),
+        }
         requests.post('https://sc.ftqq.com/SCU92977Ta943f796c0248f26c595e01585c6b30e5e8d16eeda6e0.send', data=data)
     else:
-        requests.post('https://sc.ftqq.com/SCU92977Ta943f796c0248f26c595e01585c6b30e5e8d16eeda6e0.send', params={'text':'无'})
+        requests.get('https://sc.ftqq.com/SCU92977Ta943f796c0248f26c595e01585c6b30e5e8d16eeda6e0.send', params={'text':'无'})
 
 def requestXiaoXiaoSearchWithWd(wd):
     params = {
