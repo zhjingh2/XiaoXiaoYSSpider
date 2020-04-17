@@ -40,6 +40,7 @@ def search():
         data = request.form["json"]
         reSearch = re.search(r'\["(.*?)"\]', data).group(1)
         searchword = reSearch.encode('utf-8').decode('unicode_escape')
+        searchword = searchword.replace('搜索', '')
         app.logger.warning("POST" + searchword)
         executor.submit(asyRequestXiaoXiaoSearchWithWd, searchword)
         return "searching.."
