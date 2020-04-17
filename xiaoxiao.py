@@ -73,7 +73,7 @@ def asyRequestXiaoXiaoSearchWithWd(wd):
             "text": wd,
             'desp': '无',
         }
-        requests.get('https://sc.ftqq.com/SCU92977Ta943f796c0248f26c595e01585c6b30e5e8d16eeda6e0.send', data=data)
+        requests.post('https://sc.ftqq.com/SCU92977Ta943f796c0248f26c595e01585c6b30e5e8d16eeda6e0.send', data=data)
 
 def requestXiaoXiaoSearchWithWd(wd):
     params = {
