@@ -45,11 +45,11 @@ def search():
         searchword = reSearch.encode('utf-8').decode('unicode_escape')
         searchword = searchword.replace('搜索', '')
         app.logger.warning("POST" + searchword)
-        executor.submit(asyRequestXiaoXiaoSearchWithWd, searchword)
+        executor.submit(asyncRequestXiaoXiaoSearchWithWd, searchword)
         return "searching.."
 
 # 异步查询视频资源信息
-def asyRequestXiaoXiaoSearchWithWd(wd):
+def asyncRequestXiaoXiaoSearchWithWd(wd):
     params = {
         '_t' : (int(time.time()) * 1000),
         'pid' : '',
