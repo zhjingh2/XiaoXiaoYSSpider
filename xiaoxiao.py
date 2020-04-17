@@ -33,8 +33,9 @@ def search():
         searchword = request.args.get('wd', '')
         return requestXiaoXiaoSearchWithWd(searchword)
     else:
-        data = request.get_data().decode('utf8')
-        app.logger.warning(type(request.form))
+        data = dict(request.get_data())
+        
+        app.logger.warning(type(data))
         return data
         searchword = re.search(r'\[.+?\]')
         return searchword
