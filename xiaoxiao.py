@@ -64,12 +64,16 @@ def asyRequestXiaoXiaoSearchWithWd(wd):
         app.logger.warning('名称: ' + info[1] + ' 集数: ' + info[3] + ' 播放地址: ' + m3u8url)
     if len(resultArr) > 0:
         data = {
-            "text" : '结果',
+            "text" : wd,
             'desp' : str(resultArr),
         }
         requests.post('https://sc.ftqq.com/SCU92977Ta943f796c0248f26c595e01585c6b30e5e8d16eeda6e0.send', data=data)
     else:
-        requests.get('https://sc.ftqq.com/SCU92977Ta943f796c0248f26c595e01585c6b30e5e8d16eeda6e0.send', params={'text':'无'})
+        data = {
+            "text": wd,
+            'desp': '无',
+        }
+        requests.get('https://sc.ftqq.com/SCU92977Ta943f796c0248f26c595e01585c6b30e5e8d16eeda6e0.send', data=data)
 
 def requestXiaoXiaoSearchWithWd(wd):
     params = {
