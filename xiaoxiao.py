@@ -34,7 +34,7 @@ def search():
         return requestXiaoXiaoSearchWithWd(searchword)
     else:
         data = request.get_data().decode('utf8')
-        app.logger.warning(type(request.values))
+        app.logger.warning(type(request.form))
         return data
         searchword = re.search(r'\[.+?\]')
         return searchword
